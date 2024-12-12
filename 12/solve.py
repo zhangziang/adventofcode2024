@@ -57,9 +57,8 @@ def cal_plant_two(x, y, garden, visited):
     directs = [(0,1), (0,-1),(1,0),(-1,0)]
     area = 0
     side = 0
-    # side node is node one axis +- 0.5
-    x_side_nodes = [] # x axis | 
-    y_side_nodes = [] # y axis --
+    # side node is node in one axis +- 0.5
+    four_side_nodes = [[],[],[],[]] # 0 left | 1 right | 2 top -- 3 bottom --
     stack = [(x,y)]
     val = garden[x][y]
     while len(stack) != 0:
@@ -74,18 +73,20 @@ def cal_plant_two(x, y, garden, visited):
             side_x = node[0] + direct[0]/2
             next_y = node[1] + direct[1]
             side_y = node[1] + direct[1]/2
-            side_direct = abs(direct[0]) # 0 mean | 1 mean --
+            side_direct = 0
+            if direct[1] == 1:
+                side_direct = 1
+            if direct[0] == -1:
+                side_direct = 2
+            if direct[0] == 1:
+                side_direct = 3
             if next_x < 0 or next_x >= len(garden) or next_y < 0 or next_y >= len(garden[0]):
-                if side_direct:
-                    y_side_nodes.append((side_x, side_y))
-                else:
-                    x_side_nodes.append((side_x, side_y))
+                side_nodes = four_side_nodes[side_direct]
+                side_nodes.append((side_x, side_y))
                 continue
             if garden[next_x][next_y] != val:
-                if side_direct:
-                    y_side_nodes.append((side_x, side_y))
-                else:
-                    x_side_nodes.append((side_x, side_y))
+                side_nodes = four_side_nodes[side_direct]
+                side_nodes.append((side_x, side_y))
                 continue
             if garden[next_x][next_y] == val and (next_x, next_y) not in visited:
                 stack.append((next_x, next_y))
@@ -113,17 +114,20 @@ def cal_plant_two(x, y, garden, visited):
                     side_num += 1
                 pre_position = position
         return side_num
-    print(x_side_nodes)
-    print(y_side_nodes)
-    x_side_num = cal_side(x_side_nodes, 0)
-    y_side_num = cal_side(y_side_nodes, 1)
-    side_num  = x_side_num + y_side_num
-    print("result",val, area,x_side_num, y_side_num, side_num, area*side_num)
+    side_num = 0
+    for direct, side_nodes in enumerate(four_side_nodes):
+        axies = 0
+        if direct > 1:
+            axies = 1
+        _side_num = cal_side(side_nodes, axies)
+        # print(direct, side_nodes, _side_num)
+        side_num += _side_num
+    # print("result",val, area, side_num, area*side_num)
     return area * side_num
 
 def solve_two():
     garden = []
-    for line in open("input4"):
+    for line in open("input"):
         garden.append(line.strip())
     visited = {} # key is (x,y)
     max_x = len(garden)
