@@ -53,6 +53,9 @@ def solve_one():
         cursor_x,cursor_y = move_cursor(cursor_x, cursor_y, max_y, visited)        
     return result
 
+# 遇到边界是时，+- 0.5 作为一个边节点，并且需要记录边界点的方向(四个位置都需要)
+# 然后对每一个方向的节点按照横/纵进行处理
+# 以横向为例，收集在同一个的纵坐标上所有的值，如果值不是连续+1 的，说明是一个边。四个方向计算完成可以得到总边数。
 def cal_plant_two(x, y, garden, visited):
     directs = [(0,1), (0,-1),(1,0),(-1,0)]
     area = 0
