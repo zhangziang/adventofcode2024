@@ -1,5 +1,7 @@
 #coding: utf-8
 
+import copy
+
 
 def get_bots():
     bots = []
@@ -50,23 +52,56 @@ def print_bots(x_len, y_len, bots):
     for line in m:
         print("".join(line))
 
+
+def check_bots(bots):
+    visted = {}
+    m = {}
+    for bot in bots:
+        m[(bot[0][0],bot[0][1])] = True
+    max_ares = 0
+    directs = [[1,0], [-1,0], [0,1], [0,-1]]
+    for bot in bots:
+        stack = [(bot[0][0], bot[0][1])]
+        _ares = 0
+        while len(stack) != 0:
+            n = stack[0]
+            stack = stack[1:]
+            if n in visted:
+                continue
+            visted[n] = True
+            
+            _ares += 1
+            for direct in directs:
+                x = n[0] + direct[0]
+                y = n[1] + direct[1]
+                if (x,y) in visted:
+                    continue
+                if (x,y) in m:
+                    stack.append((x,y))
+        max_ares = max(max_ares, _ares)
+    return max_ares
+
 def solve_two():
     bots = get_bots()
     
     x_len = 101
     y_len = 103
-    
-    for i in range(100):
-        print(f"====={i}========================================================")
-        for bot in bots:
-                # move bot 100s
+    # print_bots(x_len, y_len, bots)
+    for i in range(10000):
+        _bots = copy.deepcopy(bots)
+        for bot in _bots:
                 first_position = bot[0]
                 vel = bot[1]
-                x = (first_position[0] + 1*vel[0]) % x_len
-                y = (first_position[1] + 1*vel[1]) % y_len
+                x = (first_position[0] + i*vel[0]) % x_len
+                y = (first_position[1] + i*vel[1]) % y_len
                 bot[0] = [x, y]
-        print_bots(x_len, y_len, bots)
-
+        # check bots
+        max_ares = check_bots(_bots)
+        if max_ares > 200:
+            print(i, max_ares)
+            print_bots(x_len, y_len, _bots)
+        
+    return -1
 
 
 if __name__ == "__main__":
