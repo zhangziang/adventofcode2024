@@ -68,6 +68,31 @@ def match(target: str, tair: TairNode, i: int, fast_fail: Dict[int, bool]) -> bo
         cur_node = cur_node.sub_node[w]
 
 
+def match_v2(target: str, tair: TairNode, i: int, fast_fail: Dict[int, bool]) -> bool:
+    if i in fast_fail:
+        return False
+    if len(target) == 0:  # 应该走不到这里
+        return True
+    cur_node = tair
+    while True:
+        w = target[i]
+        if w not in cur_node.sub_node:
+            return False
+        cur_node = cur_node.sub_node[w]
+        if cur_node.can_end:
+            if i == len(target) - 1:
+                return True
+            else:  # to next match
+                matched = match_v2(target, tair, i + 1, fast_fail)
+                if matched:
+                    return True
+                else:
+                    fast_fail[i + 1] = True
+        if i == len(target) - 1:
+            return False
+        i = i + 1
+
+
 def match_count(
     target: str,
     tair: TairNode,
@@ -119,6 +144,15 @@ def sample():
         print(f"{i} -> {m}")
 
 
+def sample_v2():
+    all = "r, wr, b, g, bwu, rb, gb, br"
+    p = ["brwrr", "bggr", "gbbr", "rrbgbr", "ubwu", "bwurrg", "brgr", "bbrgwb"]
+    tair = construct_tair(all.split(", "))
+    for i in p:
+        m = match_v2(i, tair, 0, {})
+        print(f"{i} -> {m}")
+
+
 def sample_2():
     all = "r, wr, b, g, bwu, rb, gb, br"
     p = ["brwrr", "bggr", "gbbr", "rrbgbr", "ubwu", "bwurrg", "brgr", "bbrgwb"]
@@ -140,6 +174,18 @@ def solve_1():
         print(c)
 
 
+def solve_1_v2():
+    with open("input") as f:
+        tair = construct_tair(f.readline().strip().split(", "))
+        f.readline()  # jump empty line
+        c = 0
+        for i in f:
+            m = match_v2(i.strip(), tair, 0, {})
+            if m:
+                c += 1
+        print(c)
+
+
 def solve_2():
     with open("input") as f:
         tair = construct_tair(f.readline().strip().split(", "))
@@ -154,5 +200,7 @@ def solve_2():
 
 sample()
 solve_1()
+sample_v2()
+solve_1_v2()
 sample_2()
 solve_2()
